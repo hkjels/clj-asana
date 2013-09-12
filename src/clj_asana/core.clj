@@ -3,7 +3,7 @@
 
 (def asana-url "https://app.asana.com/api")
 (def api-version "1.0")
-(def aurl (concat asana-url "/" api-version))
+(def api-url (format "%s/%s" asana-url api-version))
 
 (defn get-basic-auth
   "Get basic auth creds
@@ -32,7 +32,8 @@
   "Peform a GET request
 
   :param api_target: API URI path for request" 
-  [])
+  [api-target]
+  (client/get (format "%s/%s" (api-url) api-target)))
 
 (defn -asana-post
   "Peform a POST request
@@ -53,7 +54,8 @@
 
   :param user_id: target user or self (default)
   "
-  [])
+  [user-id]
+  (-asana (format "users/%s" user-id)))
 
 (defn list-users
   "List users
@@ -69,57 +71,66 @@
   :param workspace: workspace id
   :param assignee: assignee
   "
-  [])
+  [workspace assignee]
+  (-asana (format "tasks?workspace=%d&assignee=%s" workspace assignee)))
 
 (defn get-task
   "Get a task
 
   :param task_id: id# of task"
-  [])
+  [task-id]
+  (-asana (format "tasks/%d" task-id)))
 
 (defn get-subtasks
   "Get subtasks associated with a given task
 
   :param task_id: id# of task"
-  [])
+  [task-id]
+  (-asana (format "tasks/%d/subtasks" task-id)))
 
 (defn list-projects
   "List projects in a workspace
 
   :param workspace: workspace whos projects you want to list"
-  [])
+  ([] (-asana "projects"))
+  ([workspace] "workspaces/%d/projects" workspace))
 
 (defn get-projects
   "Get project
 
   :param project_id: id# of project
   "
-  [])
+  [project-id]
+  (-asana (format "projects/%d" project-id)))
 
 (defn get-project-tasks
   "Get project tasks
 
   :param project_id: id# of project
   "
-  [])
+  [project-id]
+  (-asana (format "projects/%d/tasks" project-id)))
 
 (defn list-stories
   "List stories for task
 
   :param task_id: id# of task
   "
-  [])
+  [task-id]
+  (-asana (format "tasks/%d/stories" task-id)))
 
 (defn get-story
   "Get story
 
   :param story_id: id# of story
   "
-  [])
+  [story-id]
+  (-asana (format "tasks/%d/stories" story-id)))
 
 (defn list-workspaces
   """List workspaces"""
-  [])
+  []
+  (-asana "workspaces"))
 
 (defn create-task
   "Create a new task
@@ -197,7 +208,8 @@
   :param workspace_id: id# of workspace
   :param name: Update name
   "
-  [])
+  [workspace-id new-name]
+  (-asana-put (format "workspaces/%s" workspace-id) {"name" new-name}))
 
 (defn add-project-task
   "Add project task
@@ -205,7 +217,8 @@
   :param task_id: id# of task
   :param project_id: id# of project
   "
-  [])
+  [task-id project-id]
+  (-asana-post (format "tasks/%d/addProject" task-id) {"project" project-id})) 
 
 (defn rm-project-task
   "Remove a project from task
@@ -213,7 +226,8 @@
   :param task_id: id# of task
   :param project_id: id# of project
   "
-  [])
+  [task-id project-id]
+  (-asana-post (format "tasks/%d/removeProject" task-id) {"project" project-id}))
 
 (defn add-story
   "Add a story to task
@@ -221,7 +235,8 @@
   :param task_id: id# of task
   :param text: story contents
   "
-  [])
+  [task-id text]
+  (-asana-post (format "tasks/%d/stories" task-id)))
 
 (defn add-tag-task
   "Tag a task
@@ -229,21 +244,24 @@
   :param task_id: id# of task
   :param tag_id: id# of tag to add
   "
-  [])
+  [task-id tag-id]
+  (-asana-post (format "tasks/%d/addTag" task-id) {"tag" tag-id}))
 
 (defn get-tags
   "Get available tags for workspace
 
   :param workspace: id# of workspace
   "
-  [])
+  [workspace]
+  (-asana (format "workspaces/%s/tags" workspace)))
 
 (defn get-tag-tasks
   "Get tasks for a tag
 
   :param tag_id: id# of task
   "
-  [])
+  [tag-id] 
+  (-asana (format "tags/%d/tasks" tag-id)))
 
 (defn create-tag
   "Create tag
@@ -251,9 +269,7 @@
   :param tag_name: name of the tag to be created
   :param workspace: id# of workspace in which tag is to be created
   "
-  [])
+  [tag workspace]
+  (-asana-post "tags" {"name" tag, "workspace", workspace}))
 
-(def bauth (get-basic-auth))
-
-(defn test-request []
-  (client/get (aurl)))
+(def basic-auth (get-basic-auth))
