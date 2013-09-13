@@ -12,9 +12,9 @@
 (defn -asana
   "Peform a GET request
 
-  :param api_target: API URI path for request" 
+  :param api_target: API URI path for request"
   [api-target]
-  (let [response (client/get (format "%s/%s" api-url api-target) 
+  (let [response (client/get (format "%s/%s" api-url api-target)
                              {:basic-auth [api-key ""]
                               :as :json})]
     (if (= 200 (:status response))
@@ -24,14 +24,14 @@
   "Peform a POST request
 
   :param api_target: API URI path for request
-  :param data: POST payload" 
+  :param data: POST payload"
   [] 1)
 
 (defn -asana-put
   "Peform a PUT request
 
   :param api_target: API URI path for request
-  :param data: PUT payload" 
+  :param data: PUT payload"
   [] 1)
 
 (defn user-info
@@ -49,9 +49,16 @@
   :param workspace: list users in given workspace
   :param filters: Optional [] of filters you want to apply to listing
   "
-  [] 1)
+  [& {:keys [workspace filters]
+      :or {workspace nil
+           filters nil}}]
+  (if workspace
+    (-asana (format "workspaces/%s/users" workspace))
+    (if filters
+      (-asana (format "users?opt_fields=%s" (apply str (interpose "," (map (fn [x] (clojure.string/lower-case (clojure.string/trim x))) filters)))))
+      (-asana "users"))))
 
-(defn list-tasks 
+(defn list-tasks
   "List tasks
 
   :param workspace: workspace id
@@ -130,7 +137,17 @@
   :param followers: Optional followers for task
   :param notes: Optional notes to add to task
   "
-  [] 1)
+  [task & {:keys [new-name assignee assignee-status completed due-on followers notes]
+           :or {new-name nil
+                assignee nil
+                assignee-status nil
+                completed false
+                due-on nil
+                followers nil
+                notes nil}}]
+  (-asana-post "tasks"
+               (conj {"name" new-name "assignee" assignee "notes" notes "completed" completed "due_on" due-on}
+                     (into {} (map-indexed (fn [index value] [(format "followers[%d]" index) value]) followers)))))
 
 (defn update-task
   "Update an existing task
@@ -143,9 +160,17 @@
   :param due_on: Update due date
   :param notes: Update notes
   "
-  [] 1)
+  [task & {:keys [new-name assignee assignee-status completed due-on notes]
+           :or {new-name nil
+                assignee nil
+                assignee-status nil
+                completed false
+                due-on nil
+                notes nil}}]
+  (-asana-put (format "tasks/%s" task)
+              (conj {"name" new-name "assignee" assignee "notes" notes "completed" completed "due_on" due-on})))
 
-(defn add-parent 
+(defn add-parent
   "Set the parent for an existing task.
 
   :param task_id: id# of a task
@@ -167,7 +192,14 @@
   :param assignee: Optional user id# of subtask assignee
   :param notes: Optional subtask description
   :param followers: Optional followers for subtask"
-  [] 1)
+  [parent-id new-name & {:keys [completed assignee notes followers]
+                         :or {completed false
+                              assignee "me"
+                              notes nil
+                              followers nil}}]
+  (-asana-post (format "tasks/%s/subtasks" parent-id)
+               (conj {"name" new-name "assignee" assignee "notes" notes "completed" completed}
+                     (into {} (map-indexed (fn [index value] [(format "followers[%d]" index) value]) followers)))))
 
 (defn create-project
   "Create a new project
@@ -212,7 +244,7 @@
   :param project_id: id# of project
   "
   [task-id project-id]
-  (-asana-post (format "tasks/%d/addProject" task-id) {"project" project-id})) 
+  (-asana-post (format "tasks/%d/addProject" task-id) {"project" project-id}))
 
 (defn rm-project-task
   "Remove a project from task
@@ -254,7 +286,7 @@
 
   :param tag_id: id# of task
   "
-  [tag-id] 
+  [tag-id]
   (-asana (format "tags/%d/tasks" tag-id)))
 
 (defn create-tag
