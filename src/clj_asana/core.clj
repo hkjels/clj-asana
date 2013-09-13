@@ -26,11 +26,11 @@
   :param api_target: API URI path for request
   :param data: POST payload"
   [api-target data]
-  (let [response (client/post (format "%s/%s" api-url api-target)
+  (let [response (client/post (format "%s/%s" api-url api-target) ;"http://requestb.in/11cgoje1"
                               {:basic-auth [api-key ""]
                                :as :json
                                :form-params data})]
-    (if (= 200 (:status response))
+    (if (= 201 (:status response))
       (:body response))))
 
 
@@ -42,10 +42,10 @@
   :param data: PUT payload"
   [api-target data]
   (let [response (client/put (format "%s/%s" api-url api-target)
-                              {:basic-auth [api-key ""]
-                               :as :json
-                               :form-params data})]
-    (if (= 200 (:status response))
+                             {:basic-auth [api-key ""]
+                              :as :json
+                              :form-params data})]
+    (if (= 201 (:status response))
       (:body response))))
 
 (defn user-info
@@ -151,16 +151,14 @@
   :param followers: Optional followers for task
   :param notes: Optional notes to add to task
   "
-  [task & {:keys [new-name assignee assignee-status completed due-on followers notes]
-           :or {new-name nil
-                assignee nil
-                assignee-status nil
-                completed false
-                due-on nil
-                followers nil
-                notes nil}}]
+  [new-name workspace & {:keys [assignee assignee-status due-on followers notes]
+                         :or {assignee nil
+                              assignee-status nil
+                              due-on nil
+                              followers nil
+                              notes nil}}]
   (-asana-post "tasks"
-               (conj {"name" new-name "assignee" assignee "notes" notes "completed" completed "due_on" due-on}
+               (conj {"name" new-name "workspace" workspace "assignee" assignee "assignee-status" assignee-status "due_on" due-on "notes" notes}
                      (into {} (map-indexed (fn [index value] [(format "followers[%d]" index) value]) followers)))))
 
 (defn update-task
