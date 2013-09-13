@@ -1,6 +1,6 @@
 # clj-asana
 
-Clojure Wrapper for Asana API.
+Clojure Wrapper for [Asana API](http://developer.asana.com/documentation/).
 
 This project is a work in progress. Here's what's currently available:
 
