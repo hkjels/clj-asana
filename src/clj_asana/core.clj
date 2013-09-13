@@ -25,14 +25,28 @@
 
   :param api_target: API URI path for request
   :param data: POST payload"
-  [] 1)
+  [api-target data]
+  (let [response (client/post (format "%s/%s" api-url api-target)
+                              {:basic-auth [api-key ""]
+                               :as :json
+                               :form-params data})]
+    (if (= 200 (:status response))
+      (:body response))))
+
+
 
 (defn -asana-put
   "Peform a PUT request
 
   :param api_target: API URI path for request
   :param data: PUT payload"
-  [] 1)
+  [api-target data]
+  (let [response (client/put (format "%s/%s" api-url api-target)
+                              {:basic-auth [api-key ""]
+                               :as :json
+                               :form-params data})]
+    (if (= 200 (:status response))
+      (:body response))))
 
 (defn user-info
   "Obtain user info on yourself or other users.
