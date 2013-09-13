@@ -1,5 +1,5 @@
 (ns clj-asana.core
-  (:require [clj-http.client :as client]))
+  (:require [clj-http.client :as client])
 
 (def asana-url "https://app.asana.com/api")
 
@@ -16,7 +16,9 @@
   [api-target]
   (let [response (client/get (format "%s/%s" api-url api-target)
                              {:basic-auth [api-key ""]
-                              :as :json})]
+                              :as :json
+                              :content-type :json
+                              :throw-entire-message? true})]
     (if (= 200 (:status response))
       (:body response))))
 
@@ -26,14 +28,14 @@
   :param api_target: API URI path for request
   :param data: POST payload"
   [api-target data]
-  (let [response (client/post (format "%s/%s" api-url api-target) ;"http://requestb.in/11cgoje1"
+  (let [response (client/post (format "%s/%s" api-url api-target) 
                               {:basic-auth [api-key ""]
                                :as :json
-                               :form-params data})]
+                               :content-type :json
+                               :form-params {"data" data}
+                               :throw-entire-message? true})]
     (if (= 201 (:status response))
       (:body response))))
-
-
 
 (defn -asana-put
   "Peform a PUT request
@@ -44,7 +46,9 @@
   (let [response (client/put (format "%s/%s" api-url api-target)
                              {:basic-auth [api-key ""]
                               :as :json
-                              :form-params data})]
+                              :content-type :json
+                              :form-params {"data" data}
+                              :throw-entire-message? true})]
     (if (= 201 (:status response))
       (:body response))))
 
@@ -63,9 +67,8 @@
   :param workspace: list users in given workspace
   :param filters: Optional [] of filters you want to apply to listing
   "
-  [& {:keys [workspace filters]
-      :or {workspace nil
-           filters nil}}]
+  [& [workspace filters]]
+
   (if workspace
     (-asana (format "workspaces/%s/users" workspace))
     (if filters
@@ -158,8 +161,13 @@
                               followers nil
                               notes nil}}]
   (-asana-post "tasks"
-               (conj {"name" new-name "workspace" workspace "assignee" assignee "assignee-status" assignee-status "due_on" due-on "notes" notes}
-                     (into {} (map-indexed (fn [index value] [(format "followers[%d]" index) value]) followers)))))
+               (conj {"name" new-name 
+                      "workspace" workspace} 
+                     (if assignee {"assignee" assignee}) 
+                     (if assignee-status {"assignee_status" assignee-status})
+                     (if due-on { "due_on" due-on})
+                     (if notes { "notes" notes})
+                     (if followers (into {} (map-indexed (fn [index value] [(format "followers[%d]" index) value]) followers))))))
 
 (defn update-task
   "Update an existing task
@@ -180,7 +188,13 @@
                 due-on nil
                 notes nil}}]
   (-asana-put (format "tasks/%s" task)
-              (conj {"name" new-name "assignee" assignee "notes" notes "completed" completed "due_on" due-on})))
+              (conj (if new-name {"name" new-name})
+                    (if assignee {"assignee" assignee}) 
+                    (if assignee-status {"assignee_status" assignee-status}) 
+                    (if due-on {"due_on" due-on})
+                    (if notes {"notes" notes})
+                    (if completed {"completed" completed}) 
+                    (if due-on {"due_on" due-on}))))
 
 (defn add-parent
   "Set the parent for an existing task.
@@ -210,8 +224,11 @@
                               notes nil
                               followers nil}}]
   (-asana-post (format "tasks/%s/subtasks" parent-id)
-               (conj {"name" new-name "assignee" assignee "notes" notes "completed" completed}
-                     (into {} (map-indexed (fn [index value] [(format "followers[%d]" index) value]) followers)))))
+               (conj {"name" new-name 
+                      "assignee" assignee 
+                      "completed" completed}
+                     (if notes { "notes" notes})
+                     (if followers (into {} (map-indexed (fn [index value] [(format "followers[%d]" index) value]) followers))))))
 
 (defn create-project
   "Create a new project
@@ -224,7 +241,10 @@
   [new-name workspace & {:keys [notes archived]
                          :or {notes nil
                               archived nil}}]
-  (-asana-post "projects" {"name" new-name "workspace" workspace "notes" notes "archived" archived}))
+  (-asana-post "projects" (conj {"name" new-name 
+                                 "workspace" workspace}
+                                (if notes {"notes" notes})
+                                (if archived {"archived" archived}))))
 
 (defn update-project
   "Update project
@@ -238,7 +258,9 @@
                  :or {new-name nil
                       notes nil
                       archived false}}]
-  (-asana-put (format "projects/%s" project-id) {"name" new-name "notes" notes "archived" archived}))
+  (-asana-put (format "projects/%s" project-id) 
+              (conj (if new-name {"name" new-name}) (if notes {"notes" notes}) (if archived {"archived" archived}))))
+
 
 (defn update-workspace
   "Update workspace
