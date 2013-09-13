@@ -2,59 +2,45 @@
   (:require [clj-http.client :as client]))
 
 (def asana-url "https://app.asana.com/api")
+
 (def api-version "1.0")
+
 (def api-url (format "%s/%s" asana-url api-version))
 
-(defn get-basic-auth
-  "Get basic auth creds
-  :returns: the basic auth string
-  " 
-  [])
-
-(defn handle-exception
-  " Handle exceptions
-
-  :param r: request object
-  :param api_target: API URI path for requests
-  :param data: payload
-  :returns: 1 if exception was 429 (rate limit exceeded), otherwise, -1
-  "
-  [])
-
-(defn handle-rate-limit 
-  " Sleep for length of retry time
-
-  :param r: request object
-  "
-  [])
+(def api-key "2btZETdu.ELTTmHhqAzw5XCtWmHhnlH0")
 
 (defn -asana
   "Peform a GET request
 
   :param api_target: API URI path for request" 
   [api-target]
-  (client/get (format "%s/%s" (api-url) api-target)))
+  (let [response (client/get (format "%s/%s" api-url api-target) 
+                             {:basic-auth [api-key ""]
+                              :as :json})]
+    (if (= 200 (:status response))
+      (:body response))))
 
 (defn -asana-post
   "Peform a POST request
 
   :param api_target: API URI path for request
   :param data: POST payload" 
-  [])
+  [] 1)
 
 (defn -asana-put
   "Peform a PUT request
 
   :param api_target: API URI path for request
   :param data: PUT payload" 
-  [])
+  [] 1)
 
 (defn user-info
   "Obtain user info on yourself or other users.
 
   :param user_id: target user or self (default)
   "
-  [user-id]
+  [& {:keys [user-id]
+      :or {user-id "me"}}]
   (-asana (format "users/%s" user-id)))
 
 (defn list-users
@@ -63,7 +49,7 @@
   :param workspace: list users in given workspace
   :param filters: Optional [] of filters you want to apply to listing
   "
-  [])
+  [] 1)
 
 (defn list-tasks 
   "List tasks
@@ -93,7 +79,7 @@
 
   :param workspace: workspace whos projects you want to list"
   ([] (-asana "projects"))
-  ([workspace] "workspaces/%d/projects" workspace))
+  ([workspace] (-asana (format "workspaces/%d/projects" workspace))))
 
 (defn get-projects
   "Get project
@@ -128,7 +114,7 @@
   (-asana (format "tasks/%d/stories" story-id)))
 
 (defn list-workspaces
-  """List workspaces"""
+  "List workspaces"
   []
   (-asana "workspaces"))
 
@@ -144,7 +130,7 @@
   :param followers: Optional followers for task
   :param notes: Optional notes to add to task
   "
-  [])
+  [] 1)
 
 (defn update-task
   "Update an existing task
@@ -157,7 +143,7 @@
   :param due_on: Update due date
   :param notes: Update notes
   "
-  [])
+  [] 1)
 
 (defn add-parent 
   "Set the parent for an existing task.
@@ -165,7 +151,8 @@
   :param task_id: id# of a task
   :param parent_id: id# of a parent task
   "
-  [])
+  [task-id parent-id]
+  (-asana-post (format "tasks/%s/setParent" task-id) {"parent" parent-id}))
 
 (defn create-subtask
   "Creates a task and sets it's parent.
@@ -180,7 +167,7 @@
   :param assignee: Optional user id# of subtask assignee
   :param notes: Optional subtask description
   :param followers: Optional followers for subtask"
-  [])
+  [] 1)
 
 (defn create-project
   "Create a new project
@@ -190,7 +177,10 @@
   :param notes: Optional notes to add
   :param archived: Whether or not project is archived (defaults to False)
   "
-  [])
+  [new-name workspace & {:keys [notes archived]
+                         :or {notes nil
+                              archived nil}}]
+  (-asana-post "projects" {"name" new-name "workspace" workspace "notes" notes "archived" archived}))
 
 (defn update-project
   "Update project
@@ -200,7 +190,11 @@
   :param notes: Update notes
   :param archived: Update archive status
   "
-  [])
+  [project-id & {:keys [new-name notes archived]
+                 :or {new-name nil
+                      notes nil
+                      archived false}}]
+  (-asana-put (format "projects/%s" project-id) {"name" new-name "notes" notes "archived" archived}))
 
 (defn update-workspace
   "Update workspace
@@ -236,7 +230,7 @@
   :param text: story contents
   "
   [task-id text]
-  (-asana-post (format "tasks/%d/stories" task-id)))
+  (-asana-post (format "tasks/%d/stories" task-id) {"text" text}))
 
 (defn add-tag-task
   "Tag a task
@@ -271,5 +265,3 @@
   "
   [tag workspace]
   (-asana-post "tags" {"name" tag, "workspace", workspace}))
-
-(def basic-auth (get-basic-auth))
