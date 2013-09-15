@@ -35,6 +35,7 @@ This project is a work in progress. Here's what's currently available:
 
 Todo:
 
+- Asana Connect
 - Error handling
 - Documentation (:P)
 

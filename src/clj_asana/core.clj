@@ -1,4 +1,5 @@
 (ns clj-asana.core
+  "Clojure Wrapper for Asana API"
   (:require [clj-http.client :as client]))
 
 (def asana-url "https://app.asana.com/api")
