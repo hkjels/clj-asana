@@ -10,6 +10,7 @@
 
 (def api-key "2btZETdu.ELTTmHhqAzw5XCtWmHhnlH0")
 
+;;; Private functions
 (defn- asana-post
   "Peform a POST request
 
@@ -67,6 +68,8 @@
     (if (= 200 (:status response))
       (:body response))))
 
+;;; Users
+
 (defn show-user-info
   "Obtain user info on yourself or other users.
 
@@ -91,6 +94,8 @@
     (if filters
       (asana (format "users?opt_fields=%s" (apply str (interpose "," (map (fn [x] (clojure.string/lower-case (clojure.string/trim x))) filters)))))
       (asana "users"))))
+
+;;; Tasks
 
 (defn create-task
   "Create a new task
@@ -210,22 +215,6 @@
   [task-id parent-id]
   (asana-post (format "tasks/%s/setParent" task-id) {"parent" parent-id}))
 
-(defn list-task-stories
-  "List stories for task
-
-  :param task-id: id# of task
-  "
-  [task-id]
-  (asana (format "tasks/%s/stories" task-id)))
-
-(defn add-task-comment
-  "Adds a comment to an object
-  
-  :param text: Comment to be posted
-  "
-  [task-id text]
-  (asana-post (format "tasks/%s/stories" task-id) {"text" text}))
-
 (defn list-task-projects
   "Lists all projects associated with a task
   
@@ -296,6 +285,8 @@
   [task-id followers]
   (asana-post (format "tasks/%s/removeFollowers") (into {} (map-indexed (fn [index value] [(format "followers[%d]" index) value]) followers))))
 
+;;; Projects
+
 (defn create-project
   "Create a new project
 
@@ -356,6 +347,8 @@
   ([] (asana "projects"))
   ([workspace] (asana (format "workspaces/%s/projects" workspace))))
 
+;;; Tags
+
 (defn create-workspace-tag
   "Create a tag for a workspace
 
@@ -372,30 +365,13 @@
   [tag-id]
   (asana (format "tags/%s" tag-id)))
 
-(defn list-tags 
-  "Shows available tags for workspace
+(defn update-tag
+  "Update a tag
 
-  :param workspace: id# of workspace
+  :param tag-id: id# of tag
   "
-  ([] (asana "tags"))
-  ([workspace] (asana (format "workspaces/%s/tags" workspace))))
-
-
-(defn show-project-tasks
-  "Get project tasks
-
-  :param project-id: id# of project
-  "
-  [project-id]
-  (asana (format "projects/%s/tasks" project-id)))
-
-(defn show-workspace-tasks
-  "Get workspace tasks
-
-  :param workspace:id# of workspace
-  "
-  [workspace]
-  (asana (format "workspace/%s/tasks" workspace)))
+  [tag-id]
+  (asana-put (format "tags/%s" tag-id)))
 
 (defn list-tag-tasks
   "Get tasks for a tag
@@ -405,21 +381,41 @@
   [tag-id]
   (asana (format "tags/%s/tasks" tag-id)))
 
-;;; PROJECTS
+(defn list-tags 
+  "Shows available tags for workspace
 
-;;; TAGS
+  :param workspace: id# of workspace
+  "
+  ([] (asana "tags"))
+  ([workspace] (asana (format "workspaces/%s/tags" workspace))))
 
-;;; STORIES
+;;; Stories
+
+(defn list-task-stories
+  "List stories for task
+
+  :param task-id: id# of task
+  "
+  [task-id]
+  (asana (format "tasks/%s/stories" task-id)))
 
 (defn show-story
-  "Get story
+  "Show full story
 
-  :param story-id: id# of story
+  :param story-id: id# of a story
   "
   [story-id]
-  (asana (format "tasks/%s/stories" story-id)))
+  (asana (format "stories/%s" story-id)))
 
-;;; WORKSPACES
+(defn add-task-comment
+  "Adds a comment to an object
+  
+  :param text: Comment to be posted
+  "
+  [task-id text]
+  (asana-post (format "tasks/%s/stories" task-id) {"text" text}))
+
+;;; Workspaces
 
 (defn list-workspaces
   "List workspaces"
@@ -435,9 +431,9 @@
   [workspace-id new-name]
   (asana-put (format "workspaces/%s" workspace-id) {"name" new-name}))
 
-;;; TEAMS
+;;; Teams
 
-(defn show-my-teams
+(defn show-teams
   "Show all teams you're a member of in an organization
   
   :param organization-id: id# of organization
@@ -445,7 +441,7 @@
   [organization-id]
   (asana (format "organizations/%s/teams" organization-id)))
 
-;;; ATTACHMENTS
+;;; Attachments
 
 (defn show-attachment
   "Showing a single attachment

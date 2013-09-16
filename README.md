@@ -2,91 +2,64 @@
 
 Clojure Wrapper for [Asana API](http://developer.asana.com/documentation/).
 
-This project is a work in progress. Here's what's currently available:
+This project is a work in progress. Not production ready (yet). Here's what's currently available:
 
 ### Users
-- user-info
+- show-user-info
 - list-users
 
 ### Tasks
 - create-task
 - show-task
 - update-task
-- delete-task
-- list-tasks
-- list-task-projects
-- add-project-task
-- delete-project-task
-- show-project-tasks
-- show-workspace-tasks
-- show-subtasks
+- rm-task
+- list-subtasks
 - create-subtask
 - set-parent
+- list-task-projects
+- add-task-project
+- rm-task-project
+- list-task-tags
+- add-task-tag
+- rm-task-tag
+- add-task-followers
+- rm-task-followers
 
 ### Projects
 - create-project
 - show-project
 - update-project
-- delete-project
-- list-project
+- rm-project
+- list-project-tasks
+- list-projects
 
 ### Tags
-- create-tag
+- create-workspace-tag
 - show-tag
-- list-task-tags
+- update-tag
+- list-tag-tasks
+- list-tags
 
 ### Stories
-- list-stories
+- list-task-stories
 - show-story
-- add-comment
-
-### Teams
-- show-my-teams
+- add-task-comment
 
 ### Workspaces
 - list-workspaces
 - update-workspace
 
-#REAL TODO
+### Teams
+- show-teams
 
-show-user-info
-list-users
-create-task
-show-task
-update-task
-rm-task
-- list-tasks (IDK)
-list-subtasks
-create-subtask
-set-parent
-list-task-stories
-add-task-comment
-list-task-projects
-add-task-project
-rm-task-project
-list-task-tags
-add-task-tag
-rm-task-tag
-add-task-followers
-rm-task-followers
-create-project
-show-project
-update-project
-rm-project
-list-project-tasks
-list-projects
-create-workspace-tag
-show-tag
-- update-tag
-- list-tag-tasks
-- list-tags
-
-
-
+### Attachments
+- show-attachment  
+- list-task-attachments
 
 Todo:
 
-- Asana Connect
+- - list-tasks (IDK)
+- - upload attachment
 - Error handling
 - Documentation (:P)
 
@@ -102,6 +75,13 @@ code or simply bind your own
 ```clj
 (def api-key "YOUR_API_KEY")
 ```
+
+And then just shoot queries.
+
+```clj
+(list-workspaces)
+```
+
 ## Bugs? Feature requests? Pull requests?
 
 All of those are welcome. You can [file issues][issues] or [submit pull requests][pulls] in this repository.
