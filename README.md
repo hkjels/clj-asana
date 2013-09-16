@@ -2,70 +2,14 @@
 
 Clojure Wrapper for [Asana API](http://developer.asana.com/documentation/).
 
-This project is a work in progress. Here's what's currently available:
+Documentaion is available at [clj-asana documentation](http://decached.com/clj-asana/)
 
-### Users
-- show-user-info
-- list-users
-
-### Tasks
-- create-task
-- show-task
-- update-task
-- rm-task
-- list-subtasks
-- create-subtask
-- set-parent
-- list-task-projects
-- add-task-project
-- rm-task-project
-- list-task-tags
-- add-task-tag
-- rm-task-tag
-- add-task-followers
-- rm-task-followers
-
-### Projects
-- create-project
-- show-project
-- update-project
-- rm-project
-- list-project-tasks
-- list-projects
-
-### Tags
-- create-workspace-tag
-- show-tag
-- update-tag
-- list-tag-tasks
-- list-tags
-
-### Stories
-- list-task-stories
-- show-story
-- add-task-comment
-
-### Workspaces
-- list-workspaces
-- update-workspace
-
-### Teams
-- show-teams
-
-### Attachments
-- show-attachment
-- list-task-attachments
-
-Todo:
-
-- Upload attachment
-- Error handling
-- Documentation (:P)
+This project is a work in progress.
 
 ## Usage
 
 ```clj
-[clj-asana "0.0.1-SNAPSHOT"]
+[clj-asana "0.1.0"]
 ```
 
 You need to define your API-KEY. A dummy API-KEY is provided. You may edit the
@@ -80,6 +24,11 @@ And then just shoot queries.
 ```clj
 (list-workspaces)
 ```
+
+## TODO
+
+- Upload attachment feature
+- Error handling
 
 ## Bugs? Feature requests? Pull requests?
 

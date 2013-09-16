@@ -15,8 +15,9 @@
 (defn- asana-post
   "Peforms a POST request
 
-  :param api-target: API URI path for request
-  :param data: POST payload"
+  Args:
+  api-target: API URI path for request
+  data: POST payload"
   [api-target data]
   (let [response (client/post (format "%s/%s" api-url api-target)
                               {:basic-auth [api-key ""]
@@ -30,8 +31,9 @@
 (defn- asana-put
   "Peforms a PUT request
 
-  :param api-target: API URI path for request
-  :param data: PUT payload"
+  Args:
+  api-target: API URI path for request
+  data: PUT payload"
   [api-target data]
   (let [response (client/put (format "%s/%s" api-url api-target)
                              {:basic-auth [api-key ""]
@@ -45,8 +47,9 @@
 (defn- asana-delete
   "Peforms a DELETE request
 
-  :param api-target: API URI path for request
-  :param data: PUT payload"
+  Args:
+  api-target: API URI path for request
+  data: PUT payload"
   [api-target]
   (let [response (client/delete (format "%s/%s" api-url api-target)
                                 {:basic-auth [api-key ""]
@@ -59,7 +62,8 @@
 (defn- asana
   "Peforms a GET request
 
-  :param api-target: API URI path for request"
+  Args:
+  api-target: API URI path for request"
   [api-target]
   (let [response (client/get (format "%s/%s" api-url api-target)
                              {:basic-auth [api-key ""]
@@ -74,7 +78,8 @@
 (defn show-user-info
   "Obtains user info on yourself or other users.
 
-  :param user-id: target user or self (default)
+  Args:
+  user-id: target user or self (default)
   "
   [& [user-id]]
   (asana (format "users/%s" (if user-id user-id "me"))))
@@ -82,8 +87,9 @@
 (defn list-users
   "Lists users (based on workspaces) and filter the results
 
-  :param workspace: list users in given workspace
-  :param filters: Optional [] of filters you want to apply to listing
+  Args:
+  workspace: list users in given workspace
+  filters: Optional [] of filters you want to apply to listing
   "
   [& {:keys [workspace filters]
       :or {workspace nil
@@ -97,13 +103,14 @@
 (defn create-task
   "Creates a new task
 
-  :param name: Name of task
-  :param workspace: Workspace for task
-  :param assignee: Optional assignee for task
-  :param assignee-status: status
-  :param due-on: Optional due date for task
-  :param followers: Optional followers for task
-  :param notes: Optional notes to add to task
+  Args:
+  name: Name of task
+  workspace: Workspace for task
+  assignee: Optional assignee for task
+  assignee-status: status
+  due-on: Optional due date for task
+  followers: Optional followers for task
+  notes: Optional notes to add to task
   "
   [new-name workspace & {:keys [assignee assignee-status due-on followers notes]
                          :or {assignee nil
@@ -123,20 +130,22 @@
 (defn show-task
   "Shows all information about a task
 
-  :param task-id: id# of task"
+  Args:
+  task-id: id# of task"
   [task-id]
   (asana (format "tasks/%s" task-id)))
 
 (defn update-task
   "Updates an existing task
 
-  :param task: task to update
-  :param name: Update task name
-  :param assignee: Update assignee
-  :param assignee-status: Update status
-  :param completed: Update whether the task is completed
-  :param due-on: Update due date
-  :param notes: Update notes
+  Args:
+  task: task to update
+  name: Update task name
+  assignee: Update assignee
+  assignee-status: Update status
+  completed: Update whether the task is completed
+  due-on: Update due date
+  notes: Update notes
   "
   [task & {:keys [new-name assignee assignee-status completed due-on notes]
            :or {new-name nil
@@ -157,15 +166,17 @@
 (defn rm-task
   "Deletes an existing task
 
-  :param task-id: id# of task"
+  Args:
+  task-id: id# of task"
   [task-id]
   (asana-delete (format "tasks/%s" task-id)))
 
 (defn list-tasks
   "Lists tasks
 
-  :param workspace: workspace id
-  :param assignee: assignee
+  Args:
+  workspace: workspace id
+  assignee: assignee
   "
   [workspace assignee]
   (asana (format "tasks?workspace=%s&assignee=%s" workspace assignee)))
@@ -173,7 +184,8 @@
 (defn list-subtasks
   "Gets subtasks associated with a given task
 
-  :param task-id: id# of task"
+  Args:
+  task-id: id# of task"
   [task-id]
   (asana (format "tasks/%s/subtasks" task-id)))
 
@@ -185,11 +197,12 @@
   in the project task list. Only in the parent task description.
   So using this method you can avoid polluting task list with subtasks.
 
-  :param parent-id: id# of a task that subtask will be assigned to
-  :param name: subtask name
-  :param assignee: Optional user id# of subtask assignee
-  :param notes: Optional subtask description
-  :param followers: Optional followers for subtask"
+  Args:
+  parent-id: id# of a task that subtask will be assigned to
+  name: subtask name
+  assignee: Optional user id# of subtask assignee
+  notes: Optional subtask description
+  followers: Optional followers for subtask"
   [parent-id new-name & {:keys [completed assignee notes followers]
                          :or {completed false
                               assignee "me"
@@ -205,8 +218,9 @@
 (defn set-parent
   "Sets the parent for an existing task.
 
-  :param task-id: id# of a task
-  :param parent-id: id# of a parent task
+  Args:
+  task-id: id# of a task
+  parent-id: id# of a parent task
   "
   [task-id parent-id]
   (asana-post (format "tasks/%s/setParent" task-id) {"parent" parent-id}))
@@ -214,7 +228,8 @@
 (defn list-task-projects
   "Lists all projects associated with a task
 
-  :param task-id: id# of tas
+  Args:
+  task-id: id# of tas
   "
   [task-id]
   (asana (format "tasks/%s/projects" task-id)))
@@ -222,8 +237,9 @@
 (defn add-task-project
   "Adds project to a task
 
-  :param task-id: id# of task
-  :param project-id: id# of project
+  Args:
+  task-id: id# of task
+  project-id: id# of project
   "
   [task-id project-id]
   (asana-post (format "tasks/%s/addProject" task-id) {"project" project-id}))
@@ -231,8 +247,9 @@
 (defn rm-task-project
   "Removes a project from task
 
-  :param task-id: id# of task
-  :param project-id: id# of project
+  Args:
+  task-id: id# of task
+  project-id: id# of project
   "
   [task-id project-id]
   (asana-post (format "tasks/%s/removeProject" task-id) {"project" project-id}))
@@ -240,7 +257,8 @@
 (defn list-task-tags
   "Lists tags that are associated with a task.
 
-  :param task-id: id# of task
+  Args:
+  task-id: id# of task
   "
   [task-id]
   (asana (format "tasks/%s/tags" task-id)))
@@ -248,8 +266,9 @@
 (defn add-task-tag
   "Tags a task
 
-  :param task-id: id# of task
-  :param tag-id: id# of tag to add
+  Args:
+  task-id: id# of task
+  tag-id: id# of tag to add
   "
   [task-id tag-id]
   (asana-post (format "tasks/%s/addTag" task-id) {"tag" tag-id}))
@@ -257,8 +276,9 @@
 (defn rm-task-tag
   "Removes a tag from a task.
 
-  :param task-id: id# of task
-  :param tag-id: id# of tag to remove
+  Args:
+  task-id: id# of task
+  tag-id: id# of tag to remove
   "
   [task-id tag-id]
   (asana-post (format "tasks/%s/removeTag" task-id) {"tag" tag-id}))
@@ -266,8 +286,9 @@
 (defn add-task-followers
   "Adds followers to a task
 
-  :param task-id: id# of task
-  :param followers []: id#'s of followers
+  Args:
+  task-id: id# of task
+  followers []: id#'s of followers
   "
   [task-id followers]
   (asana-post (format "tasks/%s/addFollowers") (into {} (map-indexed (fn [index value] [(format "followers[%d]" index) value]) followers))))
@@ -275,8 +296,9 @@
 (defn rm-task-followers
   "Removes followers from a task
 
-  :param task-id: id# of task
-  :param followers []: id#'s of followers
+  Args:
+  task-id: id# of task
+  followers []: id#'s of followers
   "
   [task-id followers]
   (asana-post (format "tasks/%s/removeFollowers") (into {} (map-indexed (fn [index value] [(format "followers[%d]" index) value]) followers))))
@@ -286,10 +308,11 @@
 (defn create-project
   "Creates a new project
 
-  :param name: Name of project
-  :param workspace: Workspace for task
-  :param notes: Optional notes to add
-  :param archived: Whether or not project is archived (defaults to False)
+  Args:
+  name: Name of project
+  workspace: Workspace for task
+  notes: Optional notes to add
+  archived: Whether or not project is archived (defaults to False)
   "
   [new-name workspace & {:keys [notes archived]
                          :or {notes nil
@@ -302,7 +325,8 @@
 (defn show-project
   "Shows a single project
 
-  :param project-id: id# of project
+  Args:
+  project-id: id# of project
   "
   [project-id]
   (asana (format "projects/%s" project-id)))
@@ -310,10 +334,11 @@
 (defn update-project
   "Updates a project
 
-  :param project-id: id# of project
-  :param name: Update name
-  :param notes: Update notes
-  :param archived: Update archive status
+  Args:
+  project-id: id# of project
+  name: Update name
+  notes: Update notes
+  archived: Update archive status
   "
   [project-id & {:keys [new-name notes archived]
                  :or {new-name nil
@@ -325,21 +350,24 @@
 (defn rm-project
   "Deletes a project
 
-  :param project-id: id# of project"
+  Args:
+  project-id: id# of project"
   [project-id]
   (asana-delete (format "projects/%s" project-id)))
 
 (defn list-project-tasks
   "Lists non-archived tasks in this project
 
-  :param project-id: id# of project"
+  Args:
+  project-id: id# of project"
   [project-id]
   (asana (format "projects/%s/tasks" project-id)))
 
 (defn list-projects
   "Lists projects in a workspace
 
-  :param workspace: workspace whos projects you want to list"
+  Args:
+  workspace: workspace whos projects you want to list"
   ([] (asana "projects"))
   ([workspace] (asana (format "workspaces/%s/projects" workspace))))
 
@@ -348,15 +376,18 @@
 (defn create-workspace-tag
   "Creates a tag for a workspace
 
-  :param tag-name: name of the tag to be created
-  :param workspace: id# of workspace in which tag is to be created
+  Args:
+  tag-name: name of the tag to be created
+  workspace: id# of workspace in which tag is to be created
   "
   [tag workspace]
   (asana-post "tags" {"name" tag, "workspace", workspace}))
 
 (defn show-tag
   "Shows info about a tag
-  :param tag-id: id# of tag
+
+  Args:
+  tag-id: id# of tag
   "
   [tag-id]
   (asana (format "tags/%s" tag-id)))
@@ -364,7 +395,8 @@
 (defn update-tag
   "Updates a tag
 
-  :param tag-id: id# of tag
+  Args:
+  tag-id: id# of tag
   "
   [tag-id]
   (asana-put (format "tags/%s" tag-id)))
@@ -372,7 +404,8 @@
 (defn list-tag-tasks
   "Gets tasks for a tag
 
-  :param tag-id: id# of task
+  Args:
+  tag-id: id# of task
   "
   [tag-id]
   (asana (format "tags/%s/tasks" tag-id)))
@@ -380,7 +413,8 @@
 (defn list-tags
   "Shows available tags for workspace
 
-  :param workspace: id# of workspace
+  Args:
+  workspace: id# of workspace
   "
   ([] (asana "tags"))
   ([workspace] (asana (format "workspaces/%s/tags" workspace))))
@@ -390,7 +424,8 @@
 (defn list-task-stories
   "Lists stories for task
 
-  :param task-id: id# of task
+  Args:
+  task-id: id# of task
   "
   [task-id]
   (asana (format "tasks/%s/stories" task-id)))
@@ -398,7 +433,8 @@
 (defn show-story
   "Shows full story
 
-  :param story-id: id# of a story
+  Args:
+  story-id: id# of a story
   "
   [story-id]
   (asana (format "stories/%s" story-id)))
@@ -406,7 +442,8 @@
 (defn add-task-comment
   "Adds a comment to an object
 
-  :param text: Comment to be posted
+  Args:
+  text: Comment to be posted
   "
   [task-id text]
   (asana-post (format "tasks/%s/stories" task-id) {"text" text}))
@@ -421,8 +458,9 @@
 (defn update-workspace
   "Updates workspace
 
-  :param workspace-id: id# of workspace
-  :param name: Update name
+  Args:
+  workspace-id: id# of workspace
+  name: Update name
   "
   [workspace-id new-name]
   (asana-put (format "workspaces/%s" workspace-id) {"name" new-name}))
@@ -432,7 +470,8 @@
 (defn show-teams
   "Shows all teams you're a member of in an organization
 
-  :param organization-id: id# of organization
+  Args:
+  organization-id: id# of organization
   "
   [organization-id]
   (asana (format "organizations/%s/teams" organization-id)))
@@ -442,7 +481,8 @@
 (defn show-attachment
   "Shows a single attachment
 
-  :param attachment-id: id# of attachment
+  Args:
+  attachment-id: id# of attachment
   "
   [attachment-id]
   (asana (format "attachments/%s" attachment-id)))
@@ -450,7 +490,8 @@
 (defn list-task-attachements
   "Shows all attachments on a task
 
-  :param task-id: id# of task
+  Args:
+  task-id: id# of task
   "
   [task-id]
   (asana (format "tasks/%s/attachments" task-id)))
