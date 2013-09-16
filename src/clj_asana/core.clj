@@ -448,8 +448,8 @@
 
   :param attachment-id: id# of attachment
   "
-  [attachement-id]
-  (asana (format "attachments/%s" attachment-id))
+  [attachment-id]
+  (asana (format "attachments/%s" attachment-id)))
 
 (defn list-task-attachements
   "SHOWING ALL ATTACHMENTS ON A TASK
