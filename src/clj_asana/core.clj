@@ -13,7 +13,7 @@
 ;;; Private functions
 
 (defn- asana-post
-  "Peform a POST request
+  "Peforms a POST request
 
   :param api-target: API URI path for request
   :param data: POST payload"
@@ -28,7 +28,7 @@
       (:body response))))
 
 (defn- asana-put
-  "Peform a PUT request
+  "Peforms a PUT request
 
   :param api-target: API URI path for request
   :param data: PUT payload"
@@ -43,7 +43,7 @@
       (:body response))))
 
 (defn- asana-delete
-  "Peform a DELETE request
+  "Peforms a DELETE request
 
   :param api-target: API URI path for request
   :param data: PUT payload"
@@ -57,7 +57,7 @@
       (:body response))))
 
 (defn- asana
-  "Peform a GET request
+  "Peforms a GET request
 
   :param api-target: API URI path for request"
   [api-target]
@@ -72,7 +72,7 @@
 ;;; Users
 
 (defn show-user-info
-  "Obtain user info on yourself or other users.
+  "Obtains user info on yourself or other users.
 
   :param user-id: target user or self (default)
   "
@@ -80,7 +80,7 @@
   (asana (format "users/%s" (if user-id user-id "me"))))
 
 (defn list-users
-  "List users
+  "Lists users (based on workspaces) and filter the results
 
   :param workspace: list users in given workspace
   :param filters: Optional [] of filters you want to apply to listing
@@ -95,7 +95,7 @@
 ;;; Tasks
 
 (defn create-task
-  "Create a new task
+  "Creates a new task
 
   :param name: Name of task
   :param workspace: Workspace for task
@@ -121,14 +121,14 @@
                     (if followers (into {} (map-indexed (fn [index value] [(format "followers[%d]" index) value]) followers))))))
 
 (defn show-task
-  "Shows a task
+  "Shows all information about a task
 
   :param task-id: id# of task"
   [task-id]
   (asana (format "tasks/%s" task-id)))
 
 (defn update-task
-  "Update an existing task
+  "Updates an existing task
 
   :param task: task to update
   :param name: Update task name
@@ -155,14 +155,14 @@
                    (if due-on {"due_on" due-on}))))
 
 (defn rm-task
-  "Delete an existing task
+  "Deletes an existing task
 
   :param task-id: id# of task"
   [task-id]
   (asana-delete (format "tasks/%s" task-id)))
 
 (defn list-tasks
-  "List tasks
+  "Lists tasks
 
   :param workspace: workspace id
   :param assignee: assignee
@@ -171,7 +171,7 @@
   (asana (format "tasks?workspace=%s&assignee=%s" workspace assignee)))
 
 (defn list-subtasks
-  "Get subtasks associated with a given task
+  "Gets subtasks associated with a given task
 
   :param task-id: id# of task"
   [task-id]
@@ -203,7 +203,7 @@
                     (if followers (into {} (map-indexed (fn [index value] [(format "followers[%d]" index) value]) followers))))))
 
 (defn set-parent
-  "Set the parent for an existing task.
+  "Sets the parent for an existing task.
 
   :param task-id: id# of a task
   :param parent-id: id# of a parent task
@@ -220,7 +220,7 @@
   (asana (format "tasks/%s/projects" task-id)))
 
 (defn add-task-project
-  "Add project to a task
+  "Adds project to a task
 
   :param task-id: id# of task
   :param project-id: id# of project
@@ -229,7 +229,7 @@
   (asana-post (format "tasks/%s/addProject" task-id) {"project" project-id}))
 
 (defn rm-task-project
-  "Remove a project from task
+  "Removes a project from task
 
   :param task-id: id# of task
   :param project-id: id# of project
@@ -238,7 +238,7 @@
   (asana-post (format "tasks/%s/removeProject" task-id) {"project" project-id}))
 
 (defn list-task-tags
-  "List tags that are associated with a task.
+  "Lists tags that are associated with a task.
 
   :param task-id: id# of task
   "
@@ -246,7 +246,7 @@
   (asana (format "tasks/%s/tags" task-id)))
 
 (defn add-task-tag
-  "Tag a task
+  "Tags a task
 
   :param task-id: id# of task
   :param tag-id: id# of tag to add
@@ -255,7 +255,7 @@
   (asana-post (format "tasks/%s/addTag" task-id) {"tag" tag-id}))
 
 (defn rm-task-tag
-  "Remove a tag from a task.
+  "Removes a tag from a task.
 
   :param task-id: id# of task
   :param tag-id: id# of tag to remove
@@ -264,7 +264,7 @@
   (asana-post (format "tasks/%s/removeTag" task-id) {"tag" tag-id}))
 
 (defn add-task-followers
-  "add followers to a task
+  "Adds followers to a task
 
   :param task-id: id# of task
   :param followers []: id#'s of followers
@@ -273,7 +273,7 @@
   (asana-post (format "tasks/%s/addFollowers") (into {} (map-indexed (fn [index value] [(format "followers[%d]" index) value]) followers))))
 
 (defn rm-task-followers
-  "Remove followers from a task
+  "Removes followers from a task
 
   :param task-id: id# of task
   :param followers []: id#'s of followers
@@ -284,7 +284,7 @@
 ;;; Projects
 
 (defn create-project
-  "Create a new project
+  "Creates a new project
 
   :param name: Name of project
   :param workspace: Workspace for task
@@ -300,7 +300,7 @@
                                (if archived {"archived" archived}))))
 
 (defn show-project
-  "Show a single project
+  "Shows a single project
 
   :param project-id: id# of project
   "
@@ -308,7 +308,7 @@
   (asana (format "projects/%s" project-id)))
 
 (defn update-project
-  "Update project
+  "Updates a project
 
   :param project-id: id# of project
   :param name: Update name
@@ -323,21 +323,21 @@
              (conj (if new-name {"name" new-name}) (if notes {"notes" notes}) (if archived {"archived" archived}))))
 
 (defn rm-project
-  "Delete a project
+  "Deletes a project
 
   :param project-id: id# of project"
   [project-id]
   (asana-delete (format "projects/%s" project-id)))
 
 (defn list-project-tasks
-  "List non-archived tasks in this project
+  "Lists non-archived tasks in this project
 
   :param project-id: id# of project"
   [project-id]
   (asana (format "projects/%s/tasks" project-id)))
 
 (defn list-projects
-  "List projects in a workspace
+  "Lists projects in a workspace
 
   :param workspace: workspace whos projects you want to list"
   ([] (asana "projects"))
@@ -346,7 +346,7 @@
 ;;; Tags
 
 (defn create-workspace-tag
-  "Create a tag for a workspace
+  "Creates a tag for a workspace
 
   :param tag-name: name of the tag to be created
   :param workspace: id# of workspace in which tag is to be created
@@ -362,7 +362,7 @@
   (asana (format "tags/%s" tag-id)))
 
 (defn update-tag
-  "Update a tag
+  "Updates a tag
 
   :param tag-id: id# of tag
   "
@@ -370,7 +370,7 @@
   (asana-put (format "tags/%s" tag-id)))
 
 (defn list-tag-tasks
-  "Get tasks for a tag
+  "Gets tasks for a tag
 
   :param tag-id: id# of task
   "
@@ -388,7 +388,7 @@
 ;;; Stories
 
 (defn list-task-stories
-  "List stories for task
+  "Lists stories for task
 
   :param task-id: id# of task
   "
@@ -396,7 +396,7 @@
   (asana (format "tasks/%s/stories" task-id)))
 
 (defn show-story
-  "Show full story
+  "Shows full story
 
   :param story-id: id# of a story
   "
@@ -414,12 +414,12 @@
 ;;; Workspaces
 
 (defn list-workspaces
-  "List workspaces"
+  "Lists workspaces"
   []
   (asana "workspaces"))
 
 (defn update-workspace
-  "Update workspace
+  "Updates workspace
 
   :param workspace-id: id# of workspace
   :param name: Update name
@@ -430,7 +430,7 @@
 ;;; Teams
 
 (defn show-teams
-  "Show all teams you're a member of in an organization
+  "Shows all teams you're a member of in an organization
 
   :param organization-id: id# of organization
   "
@@ -440,7 +440,7 @@
 ;;; Attachments
 
 (defn show-attachment
-  "Showing a single attachment
+  "Shows a single attachment
 
   :param attachment-id: id# of attachment
   "
@@ -448,7 +448,7 @@
   (asana (format "attachments/%s" attachment-id)))
 
 (defn list-task-attachements
-  "SHOWING ALL ATTACHMENTS ON A TASK
+  "Shows all attachments on a task
 
   :param task-id: id# of task
   "
