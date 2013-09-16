@@ -11,6 +11,7 @@
 (def api-key "2btZETdu.ELTTmHhqAzw5XCtWmHhnlH0")
 
 ;;; Private functions
+
 (defn- asana-post
   "Peform a POST request
 
@@ -38,7 +39,7 @@
                               :content-type :json
                               :form-params {"data" data}
                               :throw-entire-message? true})]
-    (if (= 201 (:status response))
+    (if (= 200 (:status response))
       (:body response))))
 
 (defn- asana-delete
@@ -48,10 +49,10 @@
   :param data: PUT payload"
   [api-target]
   (let [response (client/delete (format "%s/%s" api-url api-target)
-                             {:basic-auth [api-key ""]
-                              :as :json
-                              :content-type :json
-                              :throw-entire-message? true})]
+                                {:basic-auth [api-key ""]
+                                 :as :json
+                                 :content-type :json
+                                 :throw-entire-message? true})]
     (if (= 200 (:status response))
       (:body response))))
 
@@ -75,9 +76,8 @@
 
   :param user-id: target user or self (default)
   "
-  [& {:keys [user-id]
-      :or {user-id "me"}}]
-  (asana (format "users/%s" user-id)))
+  [& [user-id]]
+  (asana (format "users/%s" (if user-id user-id "me"))))
 
 (defn list-users
   "List users
@@ -88,12 +88,9 @@
   [& {:keys [workspace filters]
       :or {workspace nil
            filters nil}}]
-
-  (if workspace
-    (asana (format "workspaces/%s/users" workspace))
-    (if filters
-      (asana (format "users?opt_fields=%s" (apply str (interpose "," (map (fn [x] (clojure.string/lower-case (clojure.string/trim x))) filters)))))
-      (asana "users"))))
+  (asana (format "%s%s"
+                 (if workspace (format "workspaces/%s/users" workspace) "users")
+                 (if filters (format "?opt_fields=%s" (apply str (interpose "," (map (fn [x] (clojure.string/lower-case (clojure.string/trim x))) filters)))) ""))))
 
 ;;; Tasks
 
@@ -104,22 +101,21 @@
   :param workspace: Workspace for task
   :param assignee: Optional assignee for task
   :param assignee-status: status
-  :param completed: Whether this task is completed (defaults to False)
   :param due-on: Optional due date for task
   :param followers: Optional followers for task
   :param notes: Optional notes to add to task
   "
   [new-name workspace & {:keys [assignee assignee-status due-on followers notes]
                          :or {assignee nil
-                              assignee-status nil
+                              assignee-status "upcoming"
                               due-on nil
                               followers nil
                               notes nil}}]
   (asana-post "tasks"
               (conj {"name" new-name
-                    "workspace" workspace}
+                     "workspace" workspace
+                     "assignee_status" assignee-status}
                     (if assignee {"assignee" assignee})
-                    (if assignee-status {"assignee_status" assignee-status})
                     (if due-on { "due_on" due-on})
                     (if notes { "notes" notes})
                     (if followers (into {} (map-indexed (fn [index value] [(format "followers[%d]" index) value]) followers))))))
@@ -145,7 +141,7 @@
   [task & {:keys [new-name assignee assignee-status completed due-on notes]
            :or {new-name nil
                 assignee nil
-                assignee-status nil
+                assignee-status "upcoming"
                 completed false
                 due-on nil
                 notes nil}}]
@@ -160,7 +156,7 @@
 
 (defn rm-task
   "Delete an existing task
-  
+
   :param task-id: id# of task"
   [task-id]
   (asana-delete (format "tasks/%s" task-id)))
@@ -217,7 +213,7 @@
 
 (defn list-task-projects
   "Lists all projects associated with a task
-  
+
   :param task-id: id# of tas
   "
   [task-id]
@@ -269,7 +265,7 @@
 
 (defn add-task-followers
   "add followers to a task
-  
+
   :param task-id: id# of task
   :param followers []: id#'s of followers
   "
@@ -278,7 +274,7 @@
 
 (defn rm-task-followers
   "Remove followers from a task
-  
+
   :param task-id: id# of task
   :param followers []: id#'s of followers
   "
@@ -303,7 +299,7 @@
                                (if notes {"notes" notes})
                                (if archived {"archived" archived}))))
 
-(defn show-project 
+(defn show-project
   "Show a single project
 
   :param project-id: id# of project
@@ -335,10 +331,10 @@
 
 (defn list-project-tasks
   "List non-archived tasks in this project
-  
+
   :param project-id: id# of project"
   [project-id]
-  (asana (format "project/%s/tasks" project-id)))
+  (asana (format "projects/%s/tasks" project-id)))
 
 (defn list-projects
   "List projects in a workspace
@@ -381,7 +377,7 @@
   [tag-id]
   (asana (format "tags/%s/tasks" tag-id)))
 
-(defn list-tags 
+(defn list-tags
   "Shows available tags for workspace
 
   :param workspace: id# of workspace
@@ -409,7 +405,7 @@
 
 (defn add-task-comment
   "Adds a comment to an object
-  
+
   :param text: Comment to be posted
   "
   [task-id text]
@@ -435,7 +431,7 @@
 
 (defn show-teams
   "Show all teams you're a member of in an organization
-  
+
   :param organization-id: id# of organization
   "
   [organization-id]

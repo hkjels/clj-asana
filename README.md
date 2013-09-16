@@ -2,7 +2,7 @@
 
 Clojure Wrapper for [Asana API](http://developer.asana.com/documentation/).
 
-This project is a work in progress. Not production ready (yet). Here's what's currently available:
+This project is a work in progress. Here's what's currently available:
 
 ### Users
 - show-user-info
@@ -53,13 +53,12 @@ This project is a work in progress. Not production ready (yet). Here's what's cu
 - show-teams
 
 ### Attachments
-- show-attachment  
+- show-attachment
 - list-task-attachments
 
 Todo:
 
-- - list-tasks (IDK)
-- - upload attachment
+- Upload attachment
 - Error handling
 - Documentation (:P)
 
